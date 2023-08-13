@@ -7,35 +7,33 @@ def chooseAction(stateIndex, epsilon, qTable, actions):
         return actions[random.randint(0, 2)]
     else:                               
         # Melhor ação
-        bestActionReward = max(qTable[stateIndex])
-        return actions[qTable[stateIndex].index(bestActionReward)]
+        return actions[qTable[stateIndex].index(max(qTable[stateIndex]))]
 
 # Inicialização
-alpha = 0.3                             # Taxa de aprendizado
-gamma = 0.9                             # Fator de desconto
-epsilon = 0.1                           # Aleatoriedade
-actions = ["left", "right", "jump"]     # Três ações possíveis
-qTable = []                             # Cria qTable
-for i in range(96):                     # Preenche de zeros
-    qTable.append([0,0,0])
-state = 0                               # Começa na plataforma 0
-reward = 0                              # Prêmio
+alpha = 0.3                                 # Taxa de aprendizado: Quanto o agente aprende com novas ações
+gamma = 0.9                                 # Fator de desconto: Quanto o agente valoriza recompensas futuras
+epsilon = 0.1                               # Aleatoriedade: Chance de escolher uma ação ao acaso
+actions = ["left", "right", "jump"]         # Três ações possíveis
+qTable = []                                 # Cria qTable
+for i in range(96): qTable.append([0,0,0])  # Preenche de zeros
+state = 0                                   # Começa na plataforma 0
+reward = 0                                  # Prêmio
 
 s = cn.connect(2037) # Conecta ao jogo
 
-for i in range(1000): # Mil episódios
+for i in range(1000): # Serão feitos mil episódios partindo de diferentes plataformas escolhidas manualmente ao longo da execução
     while reward != 300:
         # Armazena o último estado
         previousState = state
-        # Escolhe melhor ação, mas com chance epsilon de ser aleatória, e armazena seu index
+        # Escolhe melhor ação, ou com chance epsilon de ser aleatória, e armazena seu index
         action = chooseAction(state, epsilon, qTable, actions)
         actionIndex = actions.index(action)
-        # Envia ação para o jogo e recebe estado e recompensa encontrados
+        # Envia ação para o jogo e recebe estado e recompensa resultantes
         state, reward = cn.get_state_reward(s, action)
         print(f"{state}\t{reward}\t{i}")
-        # Converta para inteiro
+        # Converte state de binário para inteiro
         state = int(state, 2)
-
+        # Calcula utilidade do último estado
         qTable[previousState][actionIndex] += alpha * (reward + gamma * max(qTable[state]) - qTable[previousState][actionIndex])
     reward = 0
 
