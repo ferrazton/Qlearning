@@ -33,7 +33,7 @@ for i in range(1000): # Serão feitos mil episódios partindo de diferentes plat
         print(f"{state}\t{reward}\t{i}")
         # Converte state de binário para inteiro
         state = int(state, 2)
-        # Calcula utilidade do último estado
+        # Calcula utilidade do último Q(s,a)
         qTable[previousState][actionIndex] += alpha * (reward + gamma * max(qTable[state]) - qTable[previousState][actionIndex])
     reward = 0
 
